@@ -1,24 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
-
+// App.js
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AuthPage from './components/Auth';
+import DashboardLayout from './components/DashboardLayout';
+import PrivateRoute from './components/PrivateRoute';
+import Dashboard from './app/dashboard';
+import UploadPage from './app/upload-page';
+import ActivityLogs from './app/activity-logs';
+import SharingCollaboration from './app/sharing-collaboration';
+import Settings from './app/settings';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <Router>
+      <Routes>
+        <Route path="/" element={<AuthPage />} />
+        <Route
+          path="/dashboard/*"
+          element={
+            <PrivateRoute>
+              <DashboardLayout />
+            </PrivateRoute>
+          }
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Route path="Dashboard" element={<Dashboard />} />
+          <Route path="UploadPage" element={<UploadPage />} />
+          <Route path="ActivityLogs" element={<ActivityLogs />} />
+          <Route path="SharingCollaboration" element={<SharingCollaboration />} />
+          <Route path="Settings" element={<Settings />} />
+          {/* Add other dashboard routes here */}
+
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
