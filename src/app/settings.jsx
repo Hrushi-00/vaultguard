@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 
 const SettingsPage = () => {
-  // Mock user data - in a real app, this would come from your auth context or API
   const [user, setUser] = useState({
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
-    createdAt: '2023-01-15',
+    fullName: '',
+    email: '',
+    createdAt: '',
     is2FAEnabled: false,
   });
 
@@ -33,16 +33,53 @@ const SettingsPage = () => {
   // Watch password fields for validation
   const newPassword = watch('newPassword');
 
+  // Fetch user profile on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  // Fetch user profile
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:4000/api/auth/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.data) {
+        setUser(response.data);
+        resetProfile({ fullName: response.data.fullName });
+      }
+    } catch (error) {
+      toast.error('Failed to fetch profile');
+      console.error('Error fetching profile:', error);
+    }
+  };
+
   // Handle profile update
   const onProfileSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setUser({ ...user, fullName: data.fullName });
-      toast.success('Profile updated successfully');
+      const token = localStorage.getItem('token');
+      const response = await axios.put('http://localhost:4000/api/auth/profile', 
+        { fullName: data.fullName },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data) {
+        setUser({ ...user, fullName: data.fullName });
+        toast.success('Profile updated successfully');
+      }
     } catch (error) {
-      toast.error('Failed to update profile');
+      toast.error(error.response?.data?.message || 'Failed to update profile');
     } finally {
       setIsLoading(false);
     }
@@ -52,12 +89,26 @@ const SettingsPage = () => {
   const onPasswordSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // Simulate API call to /api/auth/change-password
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      resetPassword();
-      toast.success('Password changed successfully');
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:4000/api/auth/change-password',
+        {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        resetPassword();
+        toast.success('Password changed successfully');
+      }
     } catch (error) {
-      toast.error('Failed to change password');
+      toast.error(error.response?.data?.message || 'Failed to change password');
     } finally {
       setIsLoading(false);
     }
@@ -111,11 +162,6 @@ const SettingsPage = () => {
     setQrCodeUrl('');
     setSecretKey('');
   };
-
-  // Reset forms when user changes
-  useEffect(() => {
-    resetProfile({ fullName: user.fullName });
-  }, [user, resetProfile]);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">

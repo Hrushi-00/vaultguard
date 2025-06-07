@@ -1,56 +1,91 @@
 import { useState } from 'react';
 import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AuthPage = () => {
   const navigate = useNavigate();
-  // Main state
-  const [view, setView] = useState('login'); // 'login', 'signup', 'forgot'
-  
-  // Login form state
+  const [view, setView] = useState('login');
+
+  // Login form
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  
-  // Signup form state
+
+  // Signup form
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+  const [signupName, setSignupName] = useState('');
   const [showSignupPassword, setShowSignupPassword] = useState(false);
-  
-  // Forgot password state
+
+  // Forgot Password
   const [forgotEmail, setForgotEmail] = useState('');
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically make an API call to verify credentials
-    // For now, we'll simulate a successful login
     try {
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Store authentication state
-      localStorage.setItem('isAuthenticated', 'true');
-      
-      // Navigate to dashboard
-      navigate('/dashboard');
+      const response = await axios.post('http://localhost:4000/api/auth/login', {
+        email,
+        password,
+      });
+
+      if (response.data.success) {
+        const { token, user } = response.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('isAuthenticated', 'true');
+        navigate('/dashboard/Dashboard');
+      } else {
+        throw new Error(response.data.message);
+      }
     } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
+      alert(error.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
-  const handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    console.log('Signup submitted', { signupEmail, signupPassword });
+    if (signupPassword !== signupConfirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:4000/api/auth/signup', {
+        email: signupEmail,
+        password: signupPassword,
+        fullName: signupName
+      });
+
+      if (response.data.success) {
+        alert('Account created! Please log in.');
+        setView('login');
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Signup failed. Please try again.');
+    }
   };
 
-  const handleForgotSubmit = (e) => {
+  const handleForgotSubmit = async (e) => {
     e.preventDefault();
-    console.log('Forgot password submitted', { forgotEmail });
-    alert(`Password reset link sent to ${forgotEmail}`);
-    setView('login');
+    try {
+      const response = await axios.post('http://localhost:4000/api/auth/forgot-password', {
+        email: forgotEmail,
+      });
+
+      if (response.data.success) {
+        alert(`Password reset link sent to ${forgotEmail}`);
+        setView('login');
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error sending reset link.');
+    }
   };
 
   return (
@@ -70,10 +105,11 @@ const AuthPage = () => {
           {view === 'signup' && 'Create a new account'}
           {view === 'forgot' && 'Reset your password'}
         </h2>
-        
+
         {view === 'login' && (
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
+
             <button 
               onClick={() => setView('signup')}
               className="font-medium text-indigo-600 hover:text-indigo-500"
@@ -86,25 +122,23 @@ const AuthPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {/* LOGIN FORM */}
+
+          {/* LOGIN */}
           {view === 'login' && (
             <form className="space-y-6" onSubmit={handleLoginSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
               </div>
 
               <div>
@@ -116,15 +150,14 @@ const AuthPage = () => {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -136,7 +169,6 @@ const AuthPage = () => {
                 <div className="flex items-center">
                   <input
                     id="remember-me"
-                    name="remember-me"
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
@@ -151,63 +183,69 @@ const AuthPage = () => {
                   <button
                     type="button"
                     onClick={() => setView('forgot')}
-                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                    className="text-indigo-600 hover:text-indigo-500"
                   >
                     Forgot your password?
                   </button>
                 </div>
               </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Sign in
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow-sm text-sm"
+              >
+                Sign in
+              </button>
             </form>
           )}
 
-          {/* SIGNUP FORM */}
+          {/* SIGNUP */}
           {view === 'signup' && (
             <form className="space-y-6" onSubmit={handleSignupSubmit}>
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  Full Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={signupName}
+                  onChange={(e) => setSignupName(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
               <div>
                 <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="signup-email"
+                  type="email"
+                  required
+                  value={signupEmail}
+                  onChange={(e) => setSignupEmail(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
               </div>
 
               <div>
                 <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <div className="mt-1 relative">
+                <div className="relative mt-1">
                   <input
                     id="signup-password"
-                    name="password"
                     type={showSignupPassword ? "text" : "password"}
-                    autoComplete="new-password"
                     required
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400"
                     onClick={() => setShowSignupPassword(!showSignupPassword)}
                   >
                     {showSignupPassword ? <FaEyeSlash /> : <FaEye />}
@@ -219,71 +257,59 @@ const AuthPage = () => {
                 <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
                   Confirm Password
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="confirm-password"
-                    name="confirm-password"
-                    type="password"
-                    required
-                    value={signupConfirmPassword}
-                    onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  required
+                  value={signupConfirmPassword}
+                  onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
               </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Create account
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow-sm text-sm"
+              >
+                Create account
+              </button>
             </form>
           )}
 
-          {/* FORGOT PASSWORD FORM */}
+          {/* FORGOT PASSWORD */}
           {view === 'forgot' && (
             <form className="space-y-6" onSubmit={handleForgotSubmit}>
               <div>
                 <label htmlFor="forgot-email" className="block text-sm font-medium text-gray-700">
                   Email address
                 </label>
-                <div className="mt-1">
-                  <input
-                    id="forgot-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  required
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
                 <p className="mt-2 text-sm text-gray-500">
-                  Enter your email and we'll send you a link to reset your password.
+                  Enter your email to receive a reset link.
                 </p>
               </div>
 
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Send reset link
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded shadow-sm text-sm"
+              >
+                Send reset link
+              </button>
             </form>
           )}
 
-          {/* Bottom links */}
           {view === 'login' && (
             <div className="mt-6 text-center text-sm">
               <button
                 onClick={() => setView('signup')}
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                className="text-indigo-600 hover:text-indigo-500"
               >
                 Don't have an account? Sign up
               </button>

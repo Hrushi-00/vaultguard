@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiSearch, FiShare2, FiUser, FiEdit2, FiTrash2, FiClock, FiDownload, FiEye, FiFile, FiFolder } from 'react-icons/fi';
+import { FiSearch, FiShare2, FiUser, FiEdit2, FiTrash2, FiClock, FiDownload, FiEye, FiFile, FiFolder, FiMail, FiPlus } from 'react-icons/fi';
 
 const PersonalSharing = () => {
   // Sample data for personal use
@@ -33,20 +33,22 @@ const PersonalSharing = () => {
   ]);
 
   // Sample contacts for personal use
-  const contacts = [
+  const [contacts, setContacts] = useState([
     { id: 101, name: 'mom@gmail.com' },
     { id: 102, name: 'dad@gmail.com' },
     { id: 103, name: 'accountant@example.com' },
     { id: 104, name: 'bestfriend@gmail.com' },
     { id: 105, name: 'sister@gmail.com' },
     { id: 106, name: 'brother@gmail.com' }
-  ];
+  ]);
 
   // State for modals and filters
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPermission, setFilterPermission] = useState('all');
+  const [newEmail, setNewEmail] = useState('');
 
   // State for sharing form
   const [shareForm, setShareForm] = useState({
@@ -54,6 +56,13 @@ const PersonalSharing = () => {
     permission: 'view',
     expiryDate: '',
     hasExpiry: false
+  });
+
+  // State for email form
+  const [emailForm, setEmailForm] = useState({
+    subject: '',
+    message: '',
+    item: null
   });
 
   // Filter shared items
@@ -91,6 +100,22 @@ const PersonalSharing = () => {
     resetShareForm();
   };
 
+  // Handle sending email
+  const handleSendEmail = () => {
+    if (!emailForm.item || !emailForm.subject) return;
+    
+    // In a real app, you would send the email here
+    console.log('Sending email:', {
+      to: emailForm.item.sharedWith.map(share => share.name).join(', '),
+      subject: emailForm.subject,
+      message: emailForm.message,
+      item: emailForm.item.name
+    });
+    
+    setShowEmailModal(false);
+    setEmailForm({ subject: '', message: '', item: null });
+  };
+
   // Handle revoking access
   const handleRevoke = (itemId, shareId) => {
     const updatedItems = sharedItems.map(item => {
@@ -119,6 +144,19 @@ const PersonalSharing = () => {
       return item;
     });
     setSharedItems(updatedItems);
+  };
+
+  // Add new email to contacts
+  const handleAddEmail = () => {
+    if (!newEmail || !newEmail.includes('@')) return;
+    
+    const newContact = {
+      id: Math.max(...contacts.map(c => c.id), 0) + 1,
+      name: newEmail
+    };
+    
+    setContacts([...contacts, newContact]);
+    setNewEmail('');
   };
 
   // Reset share form
@@ -214,15 +252,32 @@ const PersonalSharing = () => {
                           {item.name}
                         </p>
                       </div>
-                      <button
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setShowShareModal(true);
-                        }}
-                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <FiShare2 className="mr-1" /> Share
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedItem(item);
+                            setShowShareModal(true);
+                          }}
+                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <FiShare2 className="mr-1" /> Share
+                        </button>
+                        {item.sharedWith.length > 0 && (
+                          <button
+                            onClick={() => {
+                              setEmailForm({
+                                subject: `Shared item: ${item.name}`,
+                                message: `I've shared "${item.name}" with you. Here are the details:\n\nPermission: ${item.sharedWith[0].permission}\nExpiry: ${item.sharedWith[0].expiry || 'No expiry'}`,
+                                item: item
+                              });
+                              setShowEmailModal(true);
+                            }}
+                            className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <FiMail className="mr-1" /> Email
+                          </button>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Shared with list */}
@@ -292,6 +347,26 @@ const PersonalSharing = () => {
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                   Share {selectedItem?.type}: {selectedItem?.name}
                 </h3>
+                
+                {/* Add new email */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Add new email</label>
+                  <div className="flex">
+                    <input
+                      type="email"
+                      className="flex-grow block w-full border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      placeholder="Enter email address"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                    />
+                    <button
+                      onClick={handleAddEmail}
+                      className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <FiPlus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
                 
                 {/* Recipients */}
                 <div className="mb-4">
@@ -390,6 +465,81 @@ const PersonalSharing = () => {
                     setShowShareModal(false);
                     resetShareForm();
                   }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full sm:p-6">
+              <div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                  Email Shared Item: {emailForm.item?.name}
+                </h3>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Recipients</label>
+                  <div className="p-2 bg-gray-50 rounded text-sm">
+                    {emailForm.item?.sharedWith.map(share => (
+                      <div key={share.id} className="inline-flex items-center mr-2 mb-1 px-2 py-1 bg-gray-200 rounded">
+                        <FiUser className="mr-1 h-3 w-3" />
+                        {share.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    value={emailForm.subject}
+                    onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
+                  />
+                </div>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                  <textarea
+                    rows="4"
+                    className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    value={emailForm.message}
+                    onChange={(e) => setEmailForm({...emailForm, message: e.target.value})}
+                  />
+                </div>
+                
+                <div className="bg-blue-50 p-3 rounded text-sm">
+                  <p className="font-medium">Item Details:</p>
+                  <p>Name: {emailForm.item?.name}</p>
+                  <p>Type: {emailForm.item?.type}</p>
+                  <p>Permissions: {emailForm.item?.sharedWith.map(share => `${share.name} (${share.permission})`).join(', ')}</p>
+                </div>
+              </div>
+              
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={handleSendEmail}
+                >
+                  Send Email
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                  onClick={() => setShowEmailModal(false)}
                 >
                   Cancel
                 </button>

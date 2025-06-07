@@ -14,12 +14,8 @@ function App() {
       <Routes>
         <Route path="/" element={<AuthPage />} />
         <Route
-          path="/dashboard/*"
-          element={
-            <PrivateRoute>
-              <DashboardLayout />
-            </PrivateRoute>
-          }
+          path="Dashboard"
+          element={<PrivateRoute><DashboardLayout /></PrivateRoute>}
         >
           <Route path="Dashboard" element={<Dashboard />} />
           <Route path="UploadPage" element={<UploadPage />} />
