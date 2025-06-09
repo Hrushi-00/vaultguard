@@ -29,6 +29,30 @@ const DashboardLayout = () => {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [userProfile, setUserProfile] = useState(null)
+
+  // Fetch user profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:4000/api/auth/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await response.json();
+        if (data.success) {
+          setUserProfile(data.user);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   // Update time every minute
   useEffect(() => {
@@ -96,7 +120,9 @@ const DashboardLayout = () => {
               </div>
               <div className="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
-            <div className="mt-3 text-lg font-semibold text-gray-800">John Doe</div>
+            <div className="mt-3 text-lg font-semibold text-gray-800">
+              {userProfile ? userProfile.fullName : 'Loading...'}
+            </div>
             <div className="text-sm text-gray-500">Administrator</div>
           </div>
 

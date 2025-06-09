@@ -184,10 +184,7 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">My Files</h1>
               <p className="text-gray-600">Manage and secure your important documents</p>
             </div>
-            {/* <Button className="bg-blue-600 hover:bg-blue-700">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Files
-            </Button> */}
+         
           </div>
 
           {/* Stats Cards */}
