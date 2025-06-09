@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,26 +9,27 @@ const SettingsPage = () => {
     fullName: '',
     email: '',
     createdAt: '',
-    is2FAEnabled: false,
+    is2FAEnabled: false
   });
 
-  const [is2FASetup] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [secretKey, setSecretKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Profile form
-  const { register: registerProfile, handleSubmit: handleProfileSubmit, reset: resetProfile } = useForm({
-    defaultValues: {
-      fullName: user.fullName,
-    },
-  });
+  const { 
+    register: registerProfile, 
+    handleSubmit: handleProfileSubmit, 
+    reset: resetProfile,
+    formState: { errors: profileErrors }
+  } = useForm();
 
   // Password form
-  const { register: registerPassword, handleSubmit: handlePasswordSubmit, reset: resetPassword, watch, formState: { errors: passwordErrors } } = useForm();
-
-  // 2FA form
-  const { reset: reset2FA } = useForm();
+  const { 
+    register: registerPassword, 
+    handleSubmit: handlePasswordSubmit, 
+    reset: resetPassword, 
+    watch, 
+    formState: { errors: passwordErrors } 
+  } = useForm();
 
   // Watch password fields for validation
   const newPassword = watch('newPassword');
@@ -42,20 +43,27 @@ const SettingsPage = () => {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://vaultguard-backend-1.onrender.com/api/auth/profile', {
+      const response = await axios.get('http://localhost:4000/api/auth/profile', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
       
-      if (response.data) {
-        setUser(response.data);
-        resetProfile({ fullName: response.data.fullName });
+      if (response.data?.success && response.data.user) {
+        setUser({
+          fullName: response.data.user.fullName,
+          email: response.data.user.email,
+          createdAt: response.data.user.createdAt,
+          is2FAEnabled: response.data.user.is2FAEnabled || false
+        });
+        
+        resetProfile({ fullName: response.data.user.fullName });
+      } else {
+        toast.error('Failed to fetch profile data');
       }
     } catch (error) {
-      toast.error('Failed to fetch profile');
-      console.error('Error fetching profile:', error);
+      toast.error(error.response?.data?.message || 'Failed to fetch profile');
     }
   };
 
@@ -64,7 +72,8 @@ const SettingsPage = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('https://vaultguard-backend-1.onrender.com/api/auth/profile', 
+      const response = await axios.put(
+        'http://localhost:4000/api/auth/profile', 
         { fullName: data.fullName },
         {
           headers: {
@@ -74,11 +83,17 @@ const SettingsPage = () => {
         }
       );
 
-      if (response.data) {
+      if (response.data.success) {
         setUser({ ...user, fullName: data.fullName });
         resetProfile({ fullName: data.fullName });
-
-        toast.success('Profile updated successfully');
+        toast.success('Profile updated successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update profile');
@@ -92,7 +107,8 @@ const SettingsPage = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('https://vaultguard-backend-1.onrender.com/api/auth/change-password',
+      const response = await axios.post(
+        'http://localhost:4000/api/auth/change-password',
         {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword
@@ -107,7 +123,14 @@ const SettingsPage = () => {
 
       if (response.data.success) {
         resetPassword();
-        toast.success('Password changed successfully');
+        toast.success('Password changed successfully!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to change password');
@@ -116,14 +139,9 @@ const SettingsPage = () => {
     }
   };
 
-  // Toggle 2FA
-
-  // Verify 2FA setup
-
-  // Cancel 2FA setup
-
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <ToastContainer />
       <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
 
       {/* Profile Section */}
@@ -134,9 +152,18 @@ const SettingsPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input
               type="text"
-              {...registerProfile('fullName', { required: 'Full name is required' })}
+              {...registerProfile('fullName', { 
+                required: 'Full name is required',
+                minLength: {
+                  value: 2,
+                  message: 'Name must be at least 2 characters'
+                }
+              })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {profileErrors.fullName && (
+              <p className="mt-1 text-sm text-red-600">{profileErrors.fullName.message}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -174,7 +201,9 @@ const SettingsPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
             <input
               type="password"
-              {...registerPassword('currentPassword', { required: 'Current password is required' })}
+              {...registerPassword('currentPassword', { 
+                required: 'Current password is required' 
+              })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {passwordErrors.currentPassword && (
@@ -187,7 +216,10 @@ const SettingsPage = () => {
               type="password"
               {...registerPassword('newPassword', {
                 required: 'New password is required',
-                minLength: { value: 8, message: 'Password must be at least 8 characters' },
+                minLength: { 
+                  value: 8, 
+                  message: 'Password must be at least 8 characters' 
+                },
                 validate: (value) => {
                   return (
                     [/[a-z]/, /[A-Z]/, /[0-9]/, /[^a-zA-Z0-9]/].every((pattern) =>
@@ -200,9 +232,6 @@ const SettingsPage = () => {
             />
             {passwordErrors.newPassword && (
               <p className="mt-1 text-sm text-red-600">{passwordErrors.newPassword.message}</p>
-            )}
-            {newPassword && !passwordErrors.newPassword && (
-              <p className="mt-1 text-sm text-green-600">Password strength: Strong</p>
             )}
           </div>
           <div>
@@ -227,7 +256,6 @@ const SettingsPage = () => {
           </button>
         </form>
       </div>
-
     </div>
   );
 };
