@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   File,
   ImageIcon,
@@ -38,69 +38,7 @@ const Dashboard = () => {
       shared: true,
       starred: false,
     },
-    {
-      id: 2,
-      name: "business_plan.docx",
-      type: "document",
-      size: "1.8 MB",
-      date: "May 28, 2025",
-      shared: true,
-      starred: true,
-    },
-    {
-      id: 3,
-      name: "family_photo.jpg",
-      type: "image",
-      size: "3.2 MB",
-      date: "May 27, 2025",
-      shared: false,
-      starred: false,
-    },
-    {
-      id: 4,
-      name: "passport_scan.jpg",
-      type: "image",
-      size: "1.5 MB",
-      date: "May 26, 2025",
-      shared: false,
-      starred: true,
-    },
-    {
-      id: 5,
-      name: "tax_documents_2023.pdf",
-      type: "document",
-      size: "4.7 MB",
-      date: "May 1, 2025",
-      shared: false,
-      starred: false,
-    },
-    {
-      id: 6,
-      name: "presentation.pptx",
-      type: "document",
-      size: "5.1 MB",
-      date: "May 25, 2025",
-      shared: true,
-      starred: false,
-    },
-    {
-      id: 7,
-      name: "vacation_photos.zip",
-      type: "archive",
-      size: "12.3 MB",
-      date: "May 24, 2025",
-      shared: false,
-      starred: false,
-    },
-    {
-      id: 8,
-      name: "contract_draft.pdf",
-      type: "document",
-      size: "890 KB",
-      date: "May 23, 2025",
-      shared: true,
-      starred: true,
-    },
+   
   ])
 
   const [recentActivity] = useState([
@@ -157,7 +95,7 @@ const Dashboard = () => {
           return Number.parseFloat(a.size) - Number.parseFloat(b.size)
         case "date":
         default:
-          return new Date(b.date) - new Date(a.date)
+          return new Date(b.uploadDate) - new Date(a.uploadDate)
       }
     })
   }, [files, searchTerm, filterType, sortBy])

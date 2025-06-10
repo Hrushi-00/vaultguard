@@ -43,7 +43,7 @@ const SettingsPage = () => {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:4000/api/auth/profile', {
+      const response = await axios.get('https://vaultguard-backend-1.onrender.com/api/auth/profile', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ const SettingsPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
-        'http://localhost:4000/api/auth/profile', 
+        'https://vaultguard-backend-1.onrender.com/api/auth/profile', 
         { fullName: data.fullName },
         {
           headers: {
@@ -108,7 +108,7 @@ const SettingsPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:4000/api/auth/change-password',
+        'https://vaultguard-backend-1.onrender.com/api/auth/change-password',
         {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword
