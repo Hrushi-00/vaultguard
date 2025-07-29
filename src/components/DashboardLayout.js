@@ -36,7 +36,7 @@ const DashboardLayout = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:4000/api/auth/profile', {
+        const response = await fetch('https://vaultguard-backend-1.onrender.com/api/auth/profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

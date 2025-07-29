@@ -26,7 +26,7 @@ const AuthPage = () => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/login', {
+      const response = await axios.post('https://vaultguard-backend-1.onrender.com/api/auth/login', {
         email,
         password,
       });
@@ -53,7 +53,7 @@ const AuthPage = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/signup', {
+      const response = await axios.post('https://vaultguard-backend-1.onrender.com/api/auth/signup', {
         email: signupEmail,
         password: signupPassword,
         fullName: signupName
@@ -73,7 +73,7 @@ const AuthPage = () => {
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/forgot-password', {
+      const response = await axios.post('https://vaultguard-backend-1.onrender.com/api/auth/forgot-password', {
         email: forgotEmail,
       });
 
