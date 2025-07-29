@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import {
   File,
   ImageIcon,
@@ -29,24 +29,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 const Dashboard = () => {
   const [files] = useState([
-    {
-      id: 1,
-      name: "financial_report_2024.pdf",
-      type: "document",
-      size: "2.4 MB",
-      date: "May 29, 2025",
-      shared: true,
-      starred: false,
-    },
+    // {
+    //   id: 1,
+    //   name: "financial_report_2024.pdf",
+    //   type: "document",
+    //   size: "2.4 MB",
+    //   date: "May 29, 2025",
+    //   shared: true,
+    //   starred: false,
+    // },
    
   ])
 
   const [recentActivity] = useState([
-    { type: "upload", user: "Chrome/macOS", time: "May 29, 2025 at 08:46 PM", file: "financial_report_2024.pdf" },
-    { type: "download", user: "Chrome/macOS", time: "May 29, 2025 at 08:46 PM", file: "business_plan.docx" },
-    { type: "share", user: "Chrome/macOS", time: "May 29, 2025 at 08:46 PM", file: "family_photo.jpg" },
-    { type: "login", user: "Chrome/macOS", time: "May 27, 2025 at 12:30 PM", file: null },
-    { type: "upload", user: "Safari/iOS", time: "May 26, 2025 at 03:15 PM", file: "passport_scan.jpg" },
+    // { type: "upload", user: "Chrome/macOS", time: "May 29, 2025 at 08:46 PM", file: "financial_report_2024.pdf" },
+    // { type: "download", user: "Chrome/macOS", time: "May 29, 2025 at 08:46 PM", file: "business_plan.docx" },
+    // { type: "share", user: "Chrome/macOS", time: "May 29, 2025 at 08:46 PM", file: "family_photo.jpg" },
+    // { type: "login", user: "Chrome/macOS", time: "May 27, 2025 at 12:30 PM", file: null },
+    // { type: "upload", user: "Safari/iOS", time: "May 26, 2025 at 03:15 PM", file: "passport_scan.jpg" },
   ])
 
   const [searchTerm, setSearchTerm] = useState("")

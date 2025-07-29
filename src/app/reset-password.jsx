@@ -30,7 +30,7 @@ const ResetPassword = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post('https://vaultguard-backend-1.onrender.com/api/auth/change-password', {
+      const response = await axios.post('http://localhost:4000/api/auth/change-password', {
         token,
         password: formData.password
       });

@@ -1,65 +1,65 @@
 import React, { useState } from 'react';
-import { FiSearch, FiDownload, FiCalendar, FiUser, FiFilter, FiFileText } from 'react-icons/fi';
+import { FiSearch, FiCalendar, FiUser, FiFilter } from 'react-icons/fi';
 
 const ActivityLogs = () => {
   // Sample log data
   const initialLogs = [
-    {
-      id: 1,
-      username: 'john.doe@example.com',
-      action: 'Viewed',
-      document: 'Q4 Financial Report.pdf',
-      timestamp: '2023-05-15T09:30:45Z',
-      ipAddress: '192.168.1.45'
-    },
-    {
-      id: 2,
-      username: 'jane.smith@example.com',
-      action: 'Downloaded',
-      document: 'Employee Handbook.docx',
-      timestamp: '2023-05-15T10:15:22Z',
-      ipAddress: '203.34.56.78'
-    },
-    {
-      id: 3,
-      username: 'admin@vaultguard.com',
-      action: 'Shared',
-      document: 'Project Roadmap.xlsx',
-      timestamp: '2023-05-14T14:20:10Z',
-      ipAddress: '172.16.0.10'
-    },
-    {
-      id: 4,
-      username: 'michael.johnson@example.com',
-      action: 'Viewed',
-      document: 'Client Contract.pdf',
-      timestamp: '2023-05-14T16:45:30Z',
-      ipAddress: '192.168.1.102'
-    },
-    {
-      id: 5,
-      username: 'sarah.williams@example.com',
-      action: 'Downloaded',
-      document: 'Marketing Strategy.pdf',
-      timestamp: '2023-05-13T11:10:15Z',
-      ipAddress: '203.34.56.79'
-    },
-    {
-      id: 6,
-      username: 'john.doe@example.com',
-      action: 'Viewed',
-      document: 'Product Specs.pdf',
-      timestamp: '2023-05-12T08:20:33Z',
-      ipAddress: '192.168.1.45'
-    },
-    {
-      id: 7,
-      username: 'admin@vaultguard.com',
-      action: 'Deleted',
-      document: 'Old Budget.xlsx',
-      timestamp: '2023-05-11T17:30:45Z',
-      ipAddress: '172.16.0.10'
-    },
+    // {
+    //   id: 1,
+    //   username: 'john.doe@example.com',
+    //   action: 'Viewed',
+    //   document: 'Q4 Financial Report.pdf',
+    //   timestamp: '2023-05-15T09:30:45Z',
+    //   ipAddress: '192.168.1.45'
+    // },
+    // {
+    //   id: 2,
+    //   username: 'jane.smith@example.com',
+    //   action: 'Downloaded',
+    //   document: 'Employee Handbook.docx',
+    //   timestamp: '2023-05-15T10:15:22Z',
+    //   ipAddress: '203.34.56.78'
+    // },
+    // {
+    //   id: 3,
+    //   username: 'admin@vaultguard.com',
+    //   action: 'Shared',
+    //   document: 'Project Roadmap.xlsx',
+    //   timestamp: '2023-05-14T14:20:10Z',
+    //   ipAddress: '172.16.0.10'
+    // },
+    // {
+    //   id: 4,
+    //   username: 'michael.johnson@example.com',
+    //   action: 'Viewed',
+    //   document: 'Client Contract.pdf',
+    //   timestamp: '2023-05-14T16:45:30Z',
+    //   ipAddress: '192.168.1.102'
+    // },
+    // {
+    //   id: 5,
+    //   username: 'sarah.williams@example.com',
+    //   action: 'Downloaded',
+    //   document: 'Marketing Strategy.pdf',
+    //   timestamp: '2023-05-13T11:10:15Z',
+    //   ipAddress: '203.34.56.79'
+    // },
+    // {
+    //   id: 6,
+    //   username: 'john.doe@example.com',
+    //   action: 'Viewed',
+    //   document: 'Product Specs.pdf',
+    //   timestamp: '2023-05-12T08:20:33Z',
+    //   ipAddress: '192.168.1.45'
+    // },
+    // {
+    //   id: 7,
+    //   username: 'admin@vaultguard.com',
+    //   action: 'Deleted',
+    //   document: 'Old Budget.xlsx',
+    //   timestamp: '2023-05-11T17:30:45Z',
+    //   ipAddress: '172.16.0.10'
+    // },
   ];
 
   const [logs, ] = useState(initialLogs);
@@ -95,30 +95,30 @@ const ActivityLogs = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Export to CSV
-  const exportToCSV = () => {
-    const headers = ['Username', 'Action', 'Document', 'Timestamp', 'IP Address'];
-    const csvContent = [
-      headers.join(','),
-      ...filteredLogs.map(log => 
-        `"${log.username}","${log.action}","${log.document}","${log.timestamp}","${log.ipAddress}"`
-      )
-    ].join('\n');
+  // const exportToCSV = () => {
+  //   const headers = ['Username', 'Action', 'Document', 'Timestamp', 'IP Address'];
+  //   const csvContent = [
+  //     headers.join(','),
+  //     ...filteredLogs.map(log => 
+  //       `"${log.username}","${log.action}","${log.document}","${log.timestamp}","${log.ipAddress}"`
+  //     )
+  //   ].join('\n');
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'vaultguard_activity_logs.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  //   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement('a');
+  //   link.setAttribute('href', url);
+  //   link.setAttribute('download', 'vaultguard_activity_logs.csv');
+  //   link.style.visibility = 'hidden';
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
 
   // Export to PDF (mock function - in a real app you'd use a library like jsPDF)
-  const exportToPDF = () => {
-    alert('PDF export functionality would be implemented here');
-  };
+  // const exportToPDF = () => {
+  //   alert('PDF export functionality would be implemented here');
+  // };
 
   // Format timestamp for display
   const formatTimestamp = (timestamp) => {

@@ -4,32 +4,32 @@ import { FiSearch, FiShare2, FiUser, FiEdit2, FiTrash2, FiClock, FiDownload, FiE
 const PersonalSharing = () => {
   // Sample data for personal use
   const [sharedItems, setSharedItems] = useState([
-    {
-      id: 1,
-      name: 'Family Photos',
-      type: 'folder',
-      sharedWith: [
-        { id: 101, name: 'mom@gmail.com', permission: 'view', expiry: '2023-12-31' },
-        { id: 102, name: 'dad@gmail.com', permission: 'download', expiry: '' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Tax Documents 2022.pdf',
-      type: 'document',
-      sharedWith: [
-        { id: 103, name: 'accountant@example.com', permission: 'download', expiry: '2023-04-15' }
-      ]
-    },
-    {
-      id: 3,
-      name: 'Personal Recipes',
-      type: 'folder',
-      sharedWith: [
-        { id: 104, name: 'bestfriend@gmail.com', permission: 'view', expiry: '' },
-        { id: 105, name: 'sister@gmail.com', permission: 'edit', expiry: '' }
-      ]
-    }
+    // {
+    //   id: 1,
+    //   name: 'Family Photos',
+    //   type: 'folder',
+    //   sharedWith: [
+    //     { id: 101, name: 'mom@gmail.com', permission: 'view', expiry: '2023-12-31' },
+    //     { id: 102, name: 'dad@gmail.com', permission: 'download', expiry: '' }
+    //   ]
+    // },
+    // {
+    //   id: 2,
+    //   name: 'Tax Documents 2022.pdf',
+    //   type: 'document',
+    //   sharedWith: [
+    //     { id: 103, name: 'accountant@example.com', permission: 'download', expiry: '2023-04-15' }
+    //   ]
+    // },
+    // {
+    //   id: 3,
+    //   name: 'Personal Recipes',
+    //   type: 'folder',
+    //   sharedWith: [
+    //     { id: 104, name: 'bestfriend@gmail.com', permission: 'view', expiry: '' },
+    //     { id: 105, name: 'sister@gmail.com', permission: 'edit', expiry: '' }
+    //   ]
+    // }
   ]);
 
   // Sample contacts for personal use

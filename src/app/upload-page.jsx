@@ -30,7 +30,7 @@ export default function UploadPage() {
   const [uploadingFile, setUploadingFile] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [newName, setNewName] = useState("")
-  const fileInputRef = useRef(null)
+  // const fileInputRef = useRef(null)
 
   // Fetch documents on component mount
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function UploadPage() {
   const fetchDocuments = async () => {
     try {
       setLoading(true)
-      const response = await fetch("https://vaultguard-backend-1.onrender.com/api/documents", {
+      const response = await fetch("http://localhost:4000/api/documents", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -63,7 +63,7 @@ export default function UploadPage() {
         return fetchDocuments()
       }
 
-      const response = await fetch(`https://vaultguard-backend-1.onrender.com/api/documents/search?query=${encodeURIComponent(searchQuery)}`, {
+      const response = await fetch(`http://localhost:4000/api/documents/search?query=${encodeURIComponent(searchQuery)}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -95,7 +95,7 @@ export default function UploadPage() {
         throw new Error('Please login to upload documents');
       }
 
-      const response = await fetch('https://vaultguard-backend-1.onrender.com/api/documents/upload', {
+      const response = await fetch('http://localhost:4000/api/documents/upload', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -181,7 +181,7 @@ export default function UploadPage() {
     if (!confirm("Are you sure you want to delete this document?")) return
 
     try {
-      const response = await fetch(`https://vaultguard-backend-1.onrender.com/api/documents/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/documents/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -214,7 +214,7 @@ const completeRename = async (id) => {
   }
 
   try {
-    const response = await fetch(`https://vaultguard-backend-1.onrender.com/api/documents/rename/${id}`, {  // Changed from /:id/rename to /rename/:id
+    const response = await fetch(`http://localhost:4000/api/documents/rename/${id}`, {  // Changed from /:id/rename to /rename/:id
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
